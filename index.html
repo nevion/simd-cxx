@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>simd-cxx by kydos</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>simd-cxx</h1>
+          <h2>The Simple DDS API for C++ </h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/kydos/simd-cxx/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/kydos/simd-cxx/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/kydos/simd-cxx" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>simd-cxx. simple. elegant. efficient.</h1>
+
+<p>simd-cxx v1.0 is an implementation of the latest C++ API for DDS as specified by the OMG DDS-PSM-C++ standard. This standard heavily drew concepts and inspiration from simd-cxx v0.x as well as from other experimental DDS APIs such as <a href="http://github.com/kydos/escalier">escalier</a>. </p>
+
+<p>The result is a simple, elegant and efficient API that I am sure you will enjoy. To wet your appetite, let's see how you might write a simple twitter application with the new API. </p>
+
+<p>Let's start by defining our Twit topic type:</p>
+
+<div class="highlight"><pre><span class="k">struct</span> <span class="n">Twit_t</span> <span class="p">{</span>
+     <span class="n">string</span> <span class="n">userid</span><span class="p">;</span>
+     <span class="n">string</span> <span class="n">msg</span><span class="p">;</span>
+ <span class="p">};</span>
+ <span class="cp">#pragma keylist Twit userid</span>
+</pre></div>
+
+<p>Let's write now the fragment of the application to post Twits:</p>
+
+<div class="highlight"><pre><span class="c1">// Create a domain participant to join the proper DDS domain</span>
+<span class="n">DomainParticipant</span> <span class="n">dp</span><span class="p">(</span><span class="n">twitterID</span><span class="p">);</span>
+<span class="c1">// Create a publisher in the given domain</span>
+<span class="n">Publisher</span> <span class="n">pub</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+<span class="c1">// Create a Twit topic in the domain</span>
+<span class="n">Topic</span><span class="o">&lt;</span><span class="n">Twit_t</span><span class="o">&gt;</span> <span class="n">twit</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="s">"Twit"</span><span class="p">);</span>
+<span class="c1">// Create a Twit DataWriter</span>
+<span class="n">DataWriter</span><span class="o">&lt;</span><span class="n">Twit_t</span><span class="o">&gt;</span> <span class="n">dw</span><span class="p">(</span><span class="n">pub</span><span class="p">,</span> <span class="n">twit</span><span class="p">);</span>
+<span class="c1">// Twit...</span>
+<span class="n">dw</span> <span class="o">&lt;&lt;</span> <span class="n">Twit</span><span class="p">(</span><span class="s">"acorsaro"</span><span class="p">,</span> <span class="s">"Have fun with #simd-cxx !"</span><span class="p">);</span>
+</pre></div>
+
+<p>The fragment of the application to read Twits is pretty similar:</p>
+
+<div class="highlight"><pre><span class="c1">// Create a domain participant to join the proper DDS domain</span>
+<span class="n">DomainParticipant</span> <span class="n">dp</span><span class="p">(</span><span class="n">twitterID</span><span class="p">);</span>
+<span class="c1">// Create a publisher in the given domain</span>
+<span class="n">Subscriber</span> <span class="n">sub</span><span class="p">(</span><span class="n">dp</span><span class="p">);</span>
+<span class="c1">// Create a Twit topic in the domain</span>
+<span class="n">Topic</span><span class="o">&lt;</span><span class="n">Twit_t</span><span class="o">&gt;</span> <span class="n">twit</span><span class="p">(</span><span class="n">dp</span><span class="p">,</span> <span class="s">"Twit"</span><span class="p">);</span>
+<span class="c1">// Create a Twit DataWriter</span>
+<span class="n">DataReader</span><span class="o">&lt;</span><span class="n">Twit_t</span><span class="o">&gt;</span> <span class="n">dr</span><span class="p">(</span><span class="n">sub</span><span class="p">,</span> <span class="n">twit</span><span class="p">);</span>
+<span class="c1">// Read Twits</span>
+<span class="n">LoanedSamples</span><span class="o">&lt;</span><span class="n">Twit_t</span><span class="o">&gt;</span> <span class="n">samples</span> <span class="o">=</span> <span class="n">dr</span><span class="p">.</span><span class="n">read</span><span class="p">();</span>
+<span class="c1">// Iterate over the read samples and print the latest twits.</span>
+<span class="n">for_each</span><span class="p">(</span><span class="n">samples</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span> <span class="n">samples</span><span class="p">.</span><span class="n">end</span><span class="p">(),</span> <span class="n">printTwit</span><span class="p">);</span>
+</pre></div>
+
+<p>Good Hacking with simd-cxx!</p>
+        </section>
+
+        <footer>
+          simd-cxx is maintained by <a href="https://github.com/kydos">kydos</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="http://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+        
+      </div>
+    </div>
+  </body>
+</html>
