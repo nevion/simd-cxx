@@ -1,3 +1,12 @@
+NOTICE
+======
+
+simd-cxx 1.0 is now part of OpenSplice DDS. As such
+simd-cxx is not maintained any more. Just clone
+OpenSplice DDS at https://github.com/prismtech/opensplice
+or download a binary at http://www.opensplice.org .
+
+
 simd-cxx 1.0
 ============
 
